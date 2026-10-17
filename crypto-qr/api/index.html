@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crypto QR code API | crypto-qr</title>
+    <meta
+      name="description"
+      content="Free HTTP API for crypto payment QR codes, with no key: one URL answers with the code as SVG or PNG, for Bitcoin, Ethereum, USDT, Solana and more."
+    />
+    <link rel="canonical" href="https://toolcrypto.github.io/crypto-qr/api/" />
+    <link rel="icon" href="/crypto-qr/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/crypto-qr/style.css" />
+  </head>
+
+  <body>
+    <header>
+      <a class="brand" href="/crypto-qr/">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/crypto-qr/logo.svg#mark" /></svg>
+        crypto-qr
+      </a>
+      <nav aria-label="Site">
+        <a href="/crypto-qr/">Generator</a>
+        <a href="https://github.com/toolcrypto/crypto-qr-api">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>QR code API for crypto payments</h1>
+      <p>
+        Payment QR codes for crypto from a URL, for where the library does not run: an image tag,
+        a server in any language, a bot. It is free and asks for no key.
+      </p>
+      <pre class="url">
+https://crypto-qr.toolcrypto.workers.dev/svg?chain=bitcoin&amp;address=bc1qm6kmam774klwlh4dhmhaatd7al02m0h0hg3van&amp;amount=0.001</pre>
+
+      <section>
+        <h2>Endpoints</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Request</th>
+              <th>Answer</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>GET /svg</code></td>
+              <td>The code, as an SVG image.</td>
+              <td><code>image/svg+xml</code></td>
+            </tr>
+            <tr>
+              <td><code>GET /png</code></td>
+              <td>The code, as a PNG image with square modules and no logo.</td>
+              <td><code>image/png</code></td>
+            </tr>
+            <tr>
+              <td><code>GET /openapi.json</code></td>
+              <td>
+                This API, described in
+                <a href="https://crypto-qr.toolcrypto.workers.dev/openapi.json">OpenAPI 3.1</a>
+                for the tools that read it.
+              </td>
+              <td><code>application/json</code></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          Both images are what <a href="https://github.com/toolcrypto/crypto-qr">the library</a>
+          draws for the same request. Parameters go in the query string, encoded as a URL wants
+          them.
+        </p>
+      </section>
+
+      <section>
+        <h2>The payment</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>chain</code></td>
+              <td>Required. One of the ids <a href="#chain">listed below</a>.</td>
+            </tr>
+            <tr>
+              <td><code>address</code></td>
+              <td>
+                Required. The payee. It is checked as far as its format goes: characters, length
+                and, where there is one, checksum. The code holds it in its canonical spelling.
+              </td>
+            </tr>
+            <tr>
+              <td><code>amount</code></td>
+              <td>
+                A decimal number in whole coins or tokens, such as <code>0.001</code>: no exponent,
+                no more decimals than the asset has, more than zero.
+              </td>
+            </tr>
+            <tr>
+              <td><code>token</code></td>
+              <td>
+                <code>USDT</code> or <code>USDC</code>, where the chain lists it. Without it, the
+                payment is in the chain's coin.
+              </td>
+            </tr>
+            <tr>
+              <td><code>label</code></td>
+              <td>Who is paid, for the payer's wallet to show.</td>
+            </tr>
+            <tr>
+              <td><code>message</code></td>
+              <td>What the payment is for, for the payer's wallet to show.</td>
+            </tr>
+            <tr>
+              <td><code>memo</code></td>
+              <td>Sent with the payment itself, as an exchange asks for to credit a deposit.</td>
+            </tr>
+            <tr>
+              <td><code>allowTestnet</code></td>
+              <td>
+                <code>true</code> to accept a test-network address. They are refused otherwise.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>The drawing</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Parameter</th>
+              <th>For</th>
+              <th>Value</th>
+              <th>Default</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>size</code></td>
+              <td><code>/svg</code></td>
+              <td>Width and height in pixels, from 16 to 8192.</td>
+              <td><code>512</code></td>
+            </tr>
+            <tr>
+              <td><code>shape</code></td>
+              <td><code>/svg</code></td>
+              <td><code>square</code>, <code>rounded</code> or <code>dots</code>.</td>
+              <td><code>square</code></td>
+            </tr>
+            <tr>
+              <td><code>logo</code></td>
+              <td><code>/svg</code></td>
+              <td><code>true</code> to draw the logo of the coin or token in the centre.</td>
+              <td><code>false</code></td>
+            </tr>
+            <tr>
+              <td><code>scale</code></td>
+              <td><code>/png</code></td>
+              <td>Pixels per module, from 1 to 16.</td>
+              <td><code>8</code></td>
+            </tr>
+            <tr>
+              <td><code>margin</code></td>
+              <td>Both</td>
+              <td>Quiet zone around the code, in modules, from 0 to 20.</td>
+              <td><code>4</code></td>
+            </tr>
+            <tr>
+              <td><code>foreground</code></td>
+              <td>Both</td>
+              <td>
+                Colour of the modules, as <code>rgb</code> or <code>rrggbb</code>. Its
+                <code>#</code> may be left out: a URL has to write it <code>%23</code>.
+              </td>
+              <td><code>000000</code></td>
+            </tr>
+            <tr>
+              <td><code>background</code></td>
+              <td>Both</td>
+              <td>Colour behind them, written the same way, or <code>transparent</code>.</td>
+              <td><code>ffffff</code></td>
+            </tr>
+            <tr>
+              <td><code>ecc</code></td>
+              <td>Both</td>
+              <td>
+                Lowest error-correction level accepted: <code>L</code>, <code>M</code>,
+                <code>Q</code> or <code>H</code>.
+              </td>
+              <td><code>M</code>, <code>Q</code> with a logo</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The level is raised whenever a stronger one fits a code of the same size. Keep the
+          foreground much darker than the background: scanners expect it. A PNG is as wide as the
+          code and its margin have modules, times <code>scale</code>: for a larger image, or one
+          of an exact width, ask for the SVG.
+        </p>
+      </section>
+
+      <section id="chain">
+        <h2>Chains</h2>
+        <table>
+          <thead>
+            <tr>
+              <th><code>chain</code></th>
+              <th>Coin</th>
+              <th><code>token</code></th>
+              <th>The code is</th>
+              <th>It carries</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="/crypto-qr/bitcoin/"><code>bitcoin</code></a></td>
+              <td>BTC</td>
+              <td></td>
+              <td>a BIP-321 link</td>
+              <td>amount, label, message</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/litecoin/"><code>litecoin</code></a></td>
+              <td>LTC</td>
+              <td></td>
+              <td>a BIP-21 link</td>
+              <td>amount, label, message</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/dogecoin/"><code>dogecoin</code></a></td>
+              <td>DOGE</td>
+              <td></td>
+              <td>a BIP-21 link</td>
+              <td>amount, label, message</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/zcash/"><code>zcash</code></a></td>
+              <td>ZEC</td>
+              <td></td>
+              <td>a ZIP-321 link</td>
+              <td>amount, label, message, and a memo for a shielded address</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/bitcoincash/"><code>bitcoincash</code></a></td>
+              <td>BCH</td>
+              <td></td>
+              <td>a BIP-21 link</td>
+              <td>amount, label, message</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/xrp/"><code>xrp</code></a></td>
+              <td>XRP</td>
+              <td></td>
+              <td>the address alone</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/monero/"><code>monero</code></a></td>
+              <td>XMR</td>
+              <td></td>
+              <td>a Monero URI</td>
+              <td>amount, label, message</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/stellar/"><code>stellar</code></a></td>
+              <td>XLM</td>
+              <td>USDC</td>
+              <td>a SEP-7 link</td>
+              <td>amount, message, memo</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/ethereum/"><code>ethereum</code></a></td>
+              <td>ETH</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/optimism/"><code>optimism</code></a></td>
+              <td>ETH</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/bsc/"><code>bsc</code></a></td>
+              <td>BNB</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/polygon/"><code>polygon</code></a></td>
+              <td>POL</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/base/"><code>base</code></a></td>
+              <td>ETH</td>
+              <td>USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/arbitrum/"><code>arbitrum</code></a></td>
+              <td>ETH</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/avalanche/"><code>avalanche</code></a></td>
+              <td>AVAX</td>
+              <td>USDT, USDC</td>
+              <td>an EIP-681 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/cardano/"><code>cardano</code></a></td>
+              <td>ADA</td>
+              <td></td>
+              <td>a CIP-13 link</td>
+              <td>amount</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/tron/"><code>tron</code></a></td>
+              <td>TRX</td>
+              <td>USDT</td>
+              <td>the address alone</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/solana/"><code>solana</code></a></td>
+              <td>SOL</td>
+              <td>USDT, USDC</td>
+              <td>a Solana Pay link</td>
+              <td>amount, label, message, memo</td>
+            </tr>
+            <tr>
+              <td><a href="/crypto-qr/ton/"><code>ton</code></a></td>
+              <td>GRAM</td>
+              <td>USDT</td>
+              <td>a ton://transfer link</td>
+              <td>amount, memo</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          A request with nothing but an address gives the address alone on every chain, which any
+          wallet or exchange scans. On an EVM chain, a token is in the code only along with an
+          amount.
+        </p>
+      </section>
+
+      <section>
+        <h2>What is left out</h2>
+        <p>
+          What a chain's code has no place for is left out of it: an amount on Tron, a label on
+          Ethereum. The image is still drawn, and the <code>Payment-Warnings</code> header names
+          what is missing, along with the library's other warnings.
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Warning</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <code>amount-not-encoded</code>, <code>token-not-encoded</code>,
+                <code>label-not-encoded</code>, <code>message-not-encoded</code>,
+                <code>memo-not-encoded</code>
+              </td>
+              <td>The code does not carry that part of the request. The payer enters it.</td>
+            </tr>
+            <tr>
+              <td><code>uri-support-varies</code></td>
+              <td>
+                Wallets of this chain do not all read its payment links. An address alone always
+                works.
+              </td>
+            </tr>
+            <tr>
+              <td><code>erc20-uri-risk</code></td>
+              <td>
+                An EIP-681 token link starts with the token contract. A scanner that does not
+                understand it may take the contract for the payee.
+              </td>
+            </tr>
+            <tr>
+              <td><code>no-checksum</code></td>
+              <td>Single-case EVM address: a typo cannot be detected.</td>
+            </tr>
+            <tr>
+              <td><code>off-curve</code></td>
+              <td>Solana address that cannot be a wallet key: a program account, or a typo.</td>
+            </tr>
+            <tr>
+              <td><code>legacy-format</code></td>
+              <td>Superseded address form.</td>
+            </tr>
+            <tr>
+              <td><code>testnet</code></td>
+              <td>Test-network address, accepted with <code>allowTestnet</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>What is refused</h2>
+        <p>
+          A request that cannot be answered gets status 400 and JSON that says why, with the
+          parameter at fault in <code>field</code>:
+        </p>
+        <pre>
+{
+"error": {
+"code": "checksum",
+"field": "address",
+"message": "The checksum does not match: at least one character is wrong."
+}
+}</pre>
+        <table>
+          <thead>
+            <tr>
+              <th><code>code</code></th>
+              <th><code>field</code></th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>unknown-chain</code></td>
+              <td><code>chain</code></td>
+              <td>Not one of the ids above.</td>
+            </tr>
+            <tr>
+              <td><code>unknown-parameter</code></td>
+              <td>its name</td>
+              <td>A parameter this endpoint does not have.</td>
+            </tr>
+            <tr>
+              <td><code>repeated-parameter</code></td>
+              <td>its name</td>
+              <td>A parameter given more than once.</td>
+            </tr>
+            <tr>
+              <td><code>invalid-option</code></td>
+              <td>its name, for a switch and for <code>scale</code></td>
+              <td>
+                A drawing parameter out of what it takes, or a request too long to fit in a QR
+                code.
+              </td>
+            </tr>
+            <tr>
+              <td><code>empty</code>, <code>format</code>, <code>length</code></td>
+              <td><code>address</code></td>
+              <td>No address, or one that is not shaped like an address of the chain.</td>
+            </tr>
+            <tr>
+              <td><code>checksum</code></td>
+              <td><code>address</code></td>
+              <td>The right shape, but its checksum does not match: almost always a typo.</td>
+            </tr>
+            <tr>
+              <td><code>wrong-chain</code></td>
+              <td><code>address</code></td>
+              <td>A valid address of another chain.</td>
+            </tr>
+            <tr>
+              <td><code>unsupported</code></td>
+              <td><code>address</code></td>
+              <td>A real address form that the library does not handle.</td>
+            </tr>
+            <tr>
+              <td><code>testnet</code></td>
+              <td><code>address</code></td>
+              <td>A test-network address, without <code>allowTestnet</code>.</td>
+            </tr>
+            <tr>
+              <td><code>token-contract</code></td>
+              <td><code>address</code></td>
+              <td>The address of a listed token itself, not of a wallet.</td>
+            </tr>
+            <tr>
+              <td><code>format</code>, <code>too-many-decimals</code>, <code>zero</code></td>
+              <td><code>amount</code></td>
+              <td>Not a plain decimal number, more decimals than the asset has, or zero.</td>
+            </tr>
+            <tr>
+              <td><code>unknown-token</code></td>
+              <td><code>token</code></td>
+              <td>A ticker the chain does not list.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          A parameter that is not known is refused, not ignored: a misspelt <code>amount</code>
+          would otherwise give a code that asks for something else than you meant. An address
+          that is not an endpoint answers 404, and a method other than GET or HEAD 405.
+        </p>
+      </section>
+
+      <section>
+        <h2>From a page</h2>
+        <p>
+          Every answer has <code>Access-Control-Allow-Origin: *</code>, so a script of any site
+          can read it. A code may be cached for a day: it depends on nothing but the URL.
+        </p>
+        <p>The API runs on Cloudflare Workers and keeps no log.</p>
+      </section>
+    </main>
+
+    <footer>
+      crypto-qr is open source under the MIT licence:
+      <a href="https://github.com/toolcrypto/crypto-qr">library</a>,
+      <a href="https://github.com/toolcrypto/crypto-qr-api">API</a>,
+      <a href="https://github.com/toolcrypto/toolcrypto.github.io">this site</a>,
+      <a href="https://www.npmjs.com/package/@toolcrypto/crypto-qr">npm</a>. The names and logos
+      of chains and tokens are trademarks of their projects. The addresses on this page are
+      placeholders, which nobody holds the keys of.
+    </footer>
+  </body>
+</html>

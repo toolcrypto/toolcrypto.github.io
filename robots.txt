@@ -1,0 +1,4 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://toolcrypto.github.io/sitemap.xml

@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tron QR code generator | crypto-qr</title>
+    <meta
+      name="description"
+      content="Free, open-source Tron QR code generator for TRX and USDT. The address is checked, and nothing leaves your browser."
+    />
+    <link rel="canonical" href="https://toolcrypto.github.io/crypto-qr/tron/" />
+    <link rel="icon" href="/crypto-qr/logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/crypto-qr/style.css" />
+    <!--
+      The library comes from jsDelivr, each file with its hash: a current browser refuses one
+      that does not match.
+    -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <script type="importmap">
+      {
+        "imports": {
+          "@toolcrypto/crypto-qr": "https://cdn.jsdelivr.net/npm/@toolcrypto/crypto-qr@0.1.0/dist/crypto-qr.min.js",
+          "@toolcrypto/crypto-qr/logos": "https://cdn.jsdelivr.net/npm/@toolcrypto/crypto-qr@0.1.0/dist/crypto-qr-logos.min.js"
+        },
+        "integrity": {
+          "https://cdn.jsdelivr.net/npm/@toolcrypto/crypto-qr@0.1.0/dist/crypto-qr.min.js": "sha384-wKjIBY5cPJZhOyEC/o5dQI4LtNJE/mfeFjetNMs31nY74VmHj3vqVxcj8OYytOfZ",
+          "https://cdn.jsdelivr.net/npm/@toolcrypto/crypto-qr@0.1.0/dist/crypto-qr-logos.min.js": "sha384-Fd8bSb4BDKTBxkEQe4Ef36YEvMQDANE9SwEYvi3wHRfPKLHBM4L3dbTRQXQXXXJO"
+        }
+      }
+    </script>
+    <script type="module" src="/crypto-qr/generator.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <a class="brand" href="/crypto-qr/">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="/crypto-qr/logo.svg#mark" /></svg>
+        crypto-qr
+      </a>
+      <nav aria-label="Site">
+        <a href="#use">Use it</a>
+        <a href="/crypto-qr/api/">API</a>
+        <a href="https://github.com/toolcrypto/crypto-qr">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Tron QR code generator</h1>
+      <p>
+        Paste your Tron address to make a QR code for TRX and USDT payments, then download it as SVG
+        or PNG. It is free and open source, the address is checked first, and nothing you type
+        leaves your browser.
+      </p>
+
+      <form name="request" class="tool" autocomplete="off">
+        <div>
+          <div class="row">
+            <label>
+              Chain
+              <select name="chain">
+                <option value="bitcoin">Bitcoin</option>
+                <option value="litecoin">Litecoin</option>
+                <option value="dogecoin">Dogecoin</option>
+                <option value="zcash">Zcash</option>
+                <option value="bitcoincash">Bitcoin Cash</option>
+                <option value="xrp">XRP Ledger</option>
+                <option value="monero">Monero</option>
+                <option value="stellar">Stellar</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="optimism">OP Mainnet</option>
+                <option value="bsc">BNB Smart Chain</option>
+                <option value="polygon">Polygon</option>
+                <option value="base">Base</option>
+                <option value="arbitrum">Arbitrum One</option>
+                <option value="avalanche">Avalanche C-Chain</option>
+                <option value="cardano">Cardano</option>
+                <option value="tron" selected>Tron</option>
+                <option value="solana">Solana</option>
+                <option value="ton">TON</option>
+              </select>
+            </label>
+            <label>Asset <select name="token"></select></label>
+          </div>
+          <div class="field">
+            <label for="address">Address</label>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              spellcheck="false"
+              autocapitalize="off"
+            />
+            <output name="status"></output>
+          </div>
+          <label hidden>
+            Amount
+            <input name="amount" type="text" inputmode="decimal" placeholder="Optional" />
+          </label>
+          <label hidden>
+            Memo
+            <input name="memo" type="text" placeholder="Optional" />
+          </label>
+          <div class="row">
+            <fieldset>
+              <legend>Shape</legend>
+              <div class="segments">
+                <label><input type="radio" name="shape" value="square" checked />Square</label>
+                <label><input type="radio" name="shape" value="rounded" />Rounded</label>
+                <label><input type="radio" name="shape" value="dots" />Dots</label>
+              </div>
+            </fieldset>
+            <label class="switch"><input type="checkbox" name="logo" checked />Logo</label>
+          </div>
+        </div>
+
+        <div class="preview">
+          <div id="code"></div>
+          <div id="result" hidden>
+            <span id="standard"></span>
+            <code id="text"></code>
+            <div class="actions">
+              <button name="svg" type="button">Download SVG</button>
+              <button name="png" type="button">Download PNG</button>
+            </div>
+            <ul id="warnings"></ul>
+          </div>
+        </div>
+      </form>
+      <nav class="chains" aria-label="Chains">
+        19 chains, with USDT and USDC where they have them:
+        <a href="/crypto-qr/bitcoin/">Bitcoin</a>,
+        <a href="/crypto-qr/litecoin/">Litecoin</a>,
+        <a href="/crypto-qr/dogecoin/">Dogecoin</a>,
+        <a href="/crypto-qr/zcash/">Zcash</a>,
+        <a href="/crypto-qr/bitcoincash/">Bitcoin Cash</a>,
+        <a href="/crypto-qr/xrp/">XRP Ledger</a>,
+        <a href="/crypto-qr/monero/">Monero</a>,
+        <a href="/crypto-qr/stellar/">Stellar</a>,
+        <a href="/crypto-qr/ethereum/">Ethereum</a>,
+        <a href="/crypto-qr/optimism/">OP Mainnet</a>,
+        <a href="/crypto-qr/bsc/">BNB Smart Chain</a>,
+        <a href="/crypto-qr/polygon/">Polygon</a>,
+        <a href="/crypto-qr/base/">Base</a>,
+        <a href="/crypto-qr/arbitrum/">Arbitrum One</a>,
+        <a href="/crypto-qr/avalanche/">Avalanche C-Chain</a>,
+        <a href="/crypto-qr/cardano/">Cardano</a>,
+        <a href="/crypto-qr/tron/" aria-current="page">Tron</a>,
+        <a href="/crypto-qr/solana/">Solana</a>,
+        <a href="/crypto-qr/ton/">TON</a>.
+      </nav>
+
+      <section>
+        <h2>Tron payment codes</h2>
+
+        <div class="way">
+          <h3>What the code holds</h3>
+          <div>
+            <p>The code is the address alone.</p>
+            <pre class="url">TWGd9idELBV3is6rrtC5PQUhudiJYeCr7E</pre>
+            <p>
+              Tron wallets agree on no payment link: an amount, or the choice of USDT, is given
+              apart.
+            </p>
+          </div>
+        </div>
+
+        <div class="way">
+          <h3>Addresses it takes</h3>
+          <p>Addresses that start with T.</p>
+        </div>
+
+        <div class="way">
+          <h3>Tokens</h3>
+          <div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>Standard</th>
+                  <th>Contract</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>USDT</td>
+                  <td>TRC-20</td>
+                  <td><code>TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="facts">
+        <div>
+          <h2>The address is checked</h2>
+          <p>
+            Its characters, its length and, where the format has one, its checksum. A test-network
+            address or the contract of a token is refused.
+          </p>
+        </div>
+        <div>
+          <h2>Each chain's own standard</h2>
+          <p>
+            BIP-321 for Bitcoin, EIP-681 for Ethereum, Solana Pay and the others, with the amount in
+            the unit each one wants.
+          </p>
+        </div>
+        <div>
+          <h2>Nothing leaves this page</h2>
+          <p>
+            The code is made in your browser: once the page is open, it works with the network cut.
+            No account, no tracker.
+          </p>
+        </div>
+        <div>
+          <h2>Open source</h2>
+          <p>
+            MIT licence, two small dependencies, tested against the vectors the standards publish.
+            Read the code of <a href="https://github.com/toolcrypto/crypto-qr">the library</a> and
+            of <a href="https://github.com/toolcrypto/toolcrypto.github.io">this page</a>.
+          </p>
+        </div>
+        <div>
+          <h2>A fixed build</h2>
+          <p>
+            This page runs one published version of the library and names the hash of its files: a
+            current browser refuses any other.
+          </p>
+        </div>
+        <div>
+          <h2>Yours to run</h2>
+          <p>
+            Install the library from npm, or build it from its source: it makes the same codes on
+            your machine, with no network.
+          </p>
+        </div>
+      </section>
+
+      <section id="use">
+        <h2>Three ways to use it</h2>
+
+        <div class="way">
+          <div>
+            <span class="tag">npm</span>
+            <h3>In your code</h3>
+            <p>
+              A typed ES module for browsers, Node, Deno, Bun and Workers. A bundler keeps only the
+              chains you import.
+            </p>
+          </div>
+          <pre>
+npm install @toolcrypto/crypto-qr
+
+import { paymentQr, tron } from '@toolcrypto/crypto-qr'
+
+const { svg, payment } = paymentQr({
+  chain: tron,
+  address: 'TWGd9idELBV3is6rrtC5PQUhudiJYeCr7E',
+})</pre>
+        </div>
+
+        <div class="way">
+          <div>
+            <span class="tag">script</span>
+            <h3>In a page, with no build step</h3>
+            <p>One file from a CDN, with everything it needs inside.</p>
+          </div>
+          <pre>
+&lt;script type=&quot;module&quot;&gt;
+  import { paymentQr, tron } from 'https://cdn.jsdelivr.net/npm/@toolcrypto/crypto-qr@0.1.0/dist/crypto-qr.min.js'
+
+  const address = 'TWGd9idELBV3is6rrtC5PQUhudiJYeCr7E'
+  document.body.innerHTML = paymentQr({ chain: tron, address }).svg
+&lt;/script&gt;</pre>
+        </div>
+
+        <div class="way">
+          <div>
+            <span class="tag">HTTP</span>
+            <h3>From a URL</h3>
+            <p>
+              For an image tag, a server in any language, a bot. Free, with no key. The address here
+              follows the form above, and <a href="/crypto-qr/api/">the API's page</a> has every
+              parameter.
+            </p>
+          </div>
+          <pre class="url"><a id="link" href="https://crypto-qr.toolcrypto.workers.dev/svg?chain=tron&amp;address=TWGd9idELBV3is6rrtC5PQUhudiJYeCr7E">https://crypto-qr.toolcrypto.workers.dev/svg?chain=tron&amp;address=TWGd9idELBV3is6rrtC5PQUhudiJYeCr7E</a></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      crypto-qr is open source under the MIT licence:
+      <a href="https://github.com/toolcrypto/crypto-qr">library</a>,
+      <a href="https://github.com/toolcrypto/crypto-qr-api">API</a>,
+      <a href="https://github.com/toolcrypto/toolcrypto.github.io">this site</a>,
+      <a href="https://www.npmjs.com/package/@toolcrypto/crypto-qr">npm</a>. The names and logos
+      of chains and tokens are trademarks of their projects. The addresses on this page are
+      placeholders, which nobody holds the keys of.
+    </footer>
+  </body>
+</html>
